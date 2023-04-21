@@ -1,0 +1,114 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::LanguageExtensions
+Description: Database template
+
+Parameters:
+  Environment:
+    Type: String
+    Default: test
+    AllowedValues: [ "test", "prod" ]
+
+Conditions:
+  ProdEnv: !Equals [!Ref Environment, "prod"]
+  TestEnv: !Equals [!Ref Environment, "test"]
+
+Resources:
+
+  HardcodedDatabaseSecret:
+    Condition: TestEnv
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Description: "Database credentials"
+      SecretString:
+        Fn::ToJsonString: 
+          username: "dbuser"
+          password: "dbpassword" # Do not do this in production!
+      Tags:
+        - Key: "Env"
+          Value: !Ref Environment
+        - Key: "Name"
+          Value: !Sub "${Environment}-${AWS::StackName}-secret"
+
+  GeneratedDatabaseSecret:
+    Condition: ProdEnv
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Description: "Database credentials"
+      GenerateSecretString:
+        SecretStringTemplate: 
+          Fn::ToJsonString: 
+            username: "dbuser"
+        GenerateStringKey: "password"
+        PasswordLength: 16
+        ExcludeCharacters: '"@/\'
+      Tags:
+        - Key: "Env"
+          Value: !Ref Environment
+        - Key: "Name"
+          Value: !Sub "${Environment}-${AWS::StackName}-secret"
+
+  DatabaseSg:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: Database security group
+      VpcId: !ImportValue VpcId
+      Tags:
+        - Key: "Env"
+          Value: !Ref Environment
+        - Key: "Name"
+          Value: !Sub "${Environment}-${AWS::StackName}-sg"
+
+  Database:
+    DeletionPolicy: !If [ProdEnv, "Retain", "Delete"]
+    Type: "AWS::RDS::DBCluster"
+    Properties:
+      Engine: aurora
+      EngineMode: serverless
+      DBSubnetGroupName: !ImportValue DbSubnetGroupId
+      ScalingConfiguration:
+        AutoPause: True
+        MaxCapacity: 1
+        MinCapacity: 1
+        SecondsUntilAutoPause: 300
+      MasterUsername:
+        Fn::If:
+          - ProdEnv 
+          - !Sub "{{resolve:secretsmanager:${GeneratedDatabaseSecret}:SecretString:username}}"  
+          - !Sub "{{resolve:secretsmanager:${HardcodedDatabaseSecret}:SecretString:username}}"  
+      MasterUserPassword:
+        Fn::If:
+          - ProdEnv 
+          - !Sub "{{resolve:secretsmanager:${GeneratedDatabaseSecret}:SecretString:password}}"  
+          - !Sub "{{resolve:secretsmanager:${HardcodedDatabaseSecret}:SecretString:password}}"  
+      VpcSecurityGroupIds:
+        - !Ref DatabaseSg
+      Tags:
+        - Key: "Env"
+          Value: !Ref Environment
+        - Key: "Name"
+          Value: !Sub "${Environment}-${AWS::StackName}-cluster"
+
+  DatabaseSgIngressRule:
+    Type: "AWS::EC2::SecurityGroupIngress"
+    Properties:
+      IpProtocol: tcp
+      FromPort: !GetAtt Database.Endpoint.Port
+      ToPort:  !GetAtt Database.Endpoint.Port
+      SourceSecurityGroupId: !ImportValue MiddlewareInstanceSg
+      GroupId: !Ref DatabaseSg
+
+Outputs:
+  DatabaseEndpointAddress:
+    Value: Database.Endpoint.Address
+    Export:
+      Name: DatabaseEndpointAddress
+
+  DatabaseEndpointPort:
+    Value: Database.Endpoint.Port
+    Export:
+      Name: DatabseEndpointPort
+
+  DbCredentials:
+    Value: !If [ProdEnv, GeneratedDatabaseSecret, HardcodedDatabaseSecret]
+    Export:
+      Name: DbCredentials
