@@ -1,0 +1,10 @@
+let subnets = Resources.*[ Type == "AWS::EC2::Subnet" ]
+
+rule no_hardcoded_cidr when %subnets !empty {
+   %subnets.Properties.Tags[*] {
+    Key in ["Env", "Name"]
+    <<
+    The subnet is missing Env or Name tag key
+    >>
+  } 
+}
