@@ -36,7 +36,7 @@ Resources:
         - Fn::GetAZs: !Ref AWS::Region
       Tags:
         - Key: "Name"
-          Value: !Sub "${Environment}-piblic-subnet01"
+          Value: !Sub "${Environment}-public-subnet01"
         - Key: "Env"
           Value: !Ref Environment
 
@@ -51,7 +51,7 @@ Resources:
         - Fn::GetAZs: !Ref AWS::Region
       Tags:
         - Key: "Name"
-          Value: !Sub "${Environment}-piblic-subnet02"
+          Value: !Sub "${Environment}-public-subnet02"
         - Key: "Env"
           Value: !Ref Environment
 
@@ -66,7 +66,7 @@ Resources:
         - Fn::GetAZs: !Ref AWS::Region
       Tags:
         - Key: "Name"
-          Value: !Sub "${Environment}-piblic-subnet03"
+          Value: !Sub "${Environment}-public-subnet03"
         - Key: "Env"
           Value: !Ref Environment
 
