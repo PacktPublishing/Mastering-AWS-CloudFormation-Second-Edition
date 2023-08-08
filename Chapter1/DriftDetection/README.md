@@ -5,7 +5,7 @@ Make sure you are in this directory and run the following command.
 
 We start with the stack creation
 ```bash
-aws cloudformation --create-stack --stack-name iamrole --template-body file://iam_role.yaml --capabilities CAPABILITY_IAM
+aws cloudformation create-stack --stack-name iamrole --template-body file://iam_role.yaml --capabilities CAPABILITY_IAM
 ```
 Now when we've reviewed that our stack is in sync, we can manually edit our role
 ```bash
