@@ -1,0 +1,77 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  Resources required to prepare for
+  using the DynamoDB Item resource type
+
+Resources:
+  ExtensionIamRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: "AllowAssumeRole"
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "resources.cloudformation.amazonaws.com"
+            Action: "sts:AssumeRole"
+
+  ExtensionLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      RetentionInDays: 7
+
+  LogPolicy:
+    Type: "AWS::IAM::Policy"
+    Properties:
+      PolicyName: "ExtensionLogPolicy"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: "AllowExtensionLogging"
+            Effect: "Allow"
+            Action:
+              - "logs:CreateLogStream"
+              - "logs:PutLogEvents"
+            Resource:
+              - !GetAtt ExtensionLogGroup.Arn
+              - !Sub "${ExtensionLogGroup.Arn}:log-stream:*"
+      Roles:
+        - !Ref ExtensionIamRole
+
+  DynamoPolicy:
+    Type: "AWS::IAM::Policy"
+    Properties:
+      PolicyName: "ExtensionDynamoDBPolicy"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement: 
+          - Sid: "AllowExtensionAccessToDynamoDBTable"
+            Effect: "Allow"
+            Action:
+              - "dynamodb:*Item"
+            Resource:
+              - !GetAtt Table.Arn
+      Roles:
+        - !Ref ExtensionIamRole
+
+  Table:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      BillingMode: "PAY_PER_REQUEST"
+      AttributeDefinitions:
+           - AttributeName: "configItem"
+             AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "configItem"
+          KeyType: "HASH"
+
+Outputs:
+  RoleArn:
+    Value: !GetAtt ExtensionIamRole.Arn
+  LogGroup:
+    Value: !Ref ExtensionLogGroup
+  DynamoDbTable:
+    Value: !Ref Table

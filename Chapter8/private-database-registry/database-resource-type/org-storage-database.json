@@ -1,0 +1,71 @@
+{
+    "typeName": "Org::Storage::Database",
+    "description": "Manage a MySQL database on a shared RDS instance",
+    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
+    "replacementStrategy": "delete_then_create",
+    "tagging": {
+        "taggable": false
+    },
+    "properties": {
+        "DatabaseName": {
+            "description": "Database name, alphanumeric",
+            "type": "string",
+            "pattern": "^[A-Za-z0-9]+$"
+        },
+        "DatabaseUser": {
+            "description": "Database user, alphanumeric",
+            "type": "string",
+            "pattern": "^[A-Za-z0-9]+$"
+        },
+        "DatabasePassword": {
+            "description": "Database password, minimum 8 symbols",
+            "type": "string",
+            "pattern": "^[A-Za-z0-9]+$",
+            "minLength": 8
+        },
+        "RdsHost": {
+            "description": "Database endpoint",
+            "type": "string"
+        },
+        "RdsUser": {
+            "description": "RDS admin user",
+            "type": "string"
+        },
+        "RdsPassword": {
+            "description": "RDS admin password",
+            "type": "string"
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "DatabaseName",
+        "DatabaseUser",
+        "DatabasePassword",
+        "RdsHost",
+        "RdsUser",
+        "RdsPassword"
+    ],
+    "createOnlyProperties": [
+        "/properties/DatabaseName"
+    ],
+    "primaryIdentifier": [
+        "/properties/DatabaseName"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": []
+        },
+        "read": {
+            "permissions": []
+        },
+        "update": {
+            "permissions": []
+        },
+        "delete": {
+            "permissions": []
+        },
+        "list": {
+            "permissions": []
+        }
+    }
+}

@@ -1,0 +1,32 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Maintain items in DynamoDB table
+Parameters:
+  TableName:
+    Type: String
+
+Resources:
+  LogLevel:
+    Type: "AwsCommunity::DynamoDB::Item"
+    Properties:
+      TableName: !Ref TableName
+      Item:
+        LogLevel:
+          S: "DEBUG"
+      Keys:
+        - AttributeName: "configItem"
+          AttributeType: "S"
+          AttributeValue: "ApplicationLogLevel"
+  ZookeeperNodes:
+    Type: "AwsCommunity::DynamoDB::Item"
+    Properties:
+      TableName: !Ref TableName
+      Item:
+        Nodes:
+          L:
+            - S: "10.0.0.10"
+            - S: "10.0.0.20"
+            - S: "10.0.0.30"
+      Keys:
+        - AttributeName: "configItem"
+          AttributeType: "S"
+          AttributeValue: "ZookeeperNodes"

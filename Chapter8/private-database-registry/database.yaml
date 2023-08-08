@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Custom DB
+Parameters:
+  DBName:
+    Type: String
+    Default: mydb
+
+  DBUser:
+    Type: String
+    Default: mydbuser
+
+  DBPassword:
+    Type: String
+    Default: foobar1234
+
+  RdsUser:
+    Type: String
+    Default: rdsuser
+
+  RdsPassword:
+    Type: String
+    Default: barfoo12344321
+
+Resources:
+  Database:
+    Type: Org::Storage::Database
+    Properties:
+      DatabaseName: !Ref DBName
+      DatabaseUser: !Ref DBUser
+      DatabasePassword: !Ref DBPassword
+      RdsHost: !ImportValue RdsEndpoint
+      RdsUser: !Ref RdsUser
+      RdsPassword: !Ref RdsPassword

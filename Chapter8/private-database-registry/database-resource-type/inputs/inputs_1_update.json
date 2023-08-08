@@ -1,0 +1,8 @@
+{
+    "DatabaseName": "myDatabase",
+    "DatabaseUser": "MyDatabaseUser",
+    "DatabasePassword": "SuperUser12",
+    "RdsHost": "RDSHOST",
+    "RdsUser": "rdsuser",
+    "RdsPassword": "barfoo12344321"
+}
