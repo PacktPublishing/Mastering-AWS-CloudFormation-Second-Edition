@@ -32,7 +32,7 @@ Resources:
     Type: "AWS::RDS::DBInstance"
     Properties:
       Engine: "MySQL"
-      EngineVersion: "5.7.22"
+      EngineVersion: "5.7.37"
       DBInstanceClass: "db.t2.micro"
       MasterUsername: !Ref RdsUser
       MasterUserPassword: !Ref RdsPassword
