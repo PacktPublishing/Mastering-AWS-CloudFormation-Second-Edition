@@ -21,7 +21,7 @@ aws cloudformation deploy --stack-name core --template-file core.yaml --capabili
 2. Create bucket and upload the code
 ```bash
 aws s3 mb s3://masteringcfn
-zip lambda-macro.zip standard-app.py
+zip lambda-macro.zip standard_app.py
 aws s3 cp lambda-macro.zip s3://masteringcfn
 ```
 3. Deploy Macro stack
@@ -37,13 +37,13 @@ aws cloudformation deploy --stack-name app --template-file app.yaml
 
 1. Publish the module
 ```bash
-cd ../modules/module
+cd ../../modules/module
 cfn submit --region REGION # pick yours
 ```
 2. Deploy core stack
 ```bash
 cd ..
-aws cloudformation deploy --stack-name core --template-file core.yaml --capabilities CAPABILITY_IAM
+aws cloudformation deploy --stack-name modulecore --template-file core.yaml --capabilities CAPABILITY_IAM
 ```
 3. Deploy modular stack
 ```bash

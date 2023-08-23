@@ -11,7 +11,8 @@ image_names = {
 def get_image(img_name):
     client = boto3.client('ec2')
     resp = client.describe_images(
-        Filters=[{'Name': 'name', 'Values': [img_name]}])
+        Filters=[{'Name': 'name', 
+                  'Values': [img_name]}])
     return resp['Images'][0]['ImageId']
 
 
