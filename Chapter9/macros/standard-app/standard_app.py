@@ -61,7 +61,8 @@ def render_ecs(input):
                         'Subnets': [
                             {'Fn::ImportValue': 'AppSubnet01'},
                             {'Fn::ImportValue': 'AppSubnet02'}
-                        ]
+                        ],
+                        'AssignPublicIp': 'ENABLED'
                     }
                 }
             }
