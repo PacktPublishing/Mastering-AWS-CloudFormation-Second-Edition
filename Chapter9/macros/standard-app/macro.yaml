@@ -26,7 +26,7 @@ Resources:
   MacroFunction:
     Type: "AWS::Lambda::Function"
     Properties:
-      Handler: "standard-app.lambda_handler"
+      Handler: "standard_app.lambda_handler"
       MemorySize: 128
       Runtime: python3.7
       Timeout: 30
