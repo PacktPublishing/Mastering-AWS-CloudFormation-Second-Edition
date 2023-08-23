@@ -1,10 +1,10 @@
 import boto3
 
 image_names = {
-    'amazonlinux2': 'amzn2-ami-hvm-2.0.20191217.0-x86_64-gp2',
-    'ubuntu': 'ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-20200112',
-    'rhel': 'RHEL-8.0.0_HVM-20190618-x86_64-1-Hourly2-GP2',
-    'sles': 'suse-sles-15-sp1-v20191112-hvm-ssd-x86_64'
+    'amazonlinux': 'al2023-ami-2023.1.20230809.0-kernel-6.1-x86_64',
+    'ubuntu': 'ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-20230516',
+    'rhel': 'RHEL-9.2.0_HVM-20230503-x86_64-41-Hourly2-GP2',
+    'sles': 'suse-sles-15-sp5-v20230620-hvm-ssd-x86_64'
 }
 
 
