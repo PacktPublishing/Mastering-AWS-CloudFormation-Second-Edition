@@ -1,0 +1,395 @@
+{
+    "typeName": "Org::Apps::StandardApp::MODULE",
+    "description": "Schema for Module Fragment of type Org::Apps::StandardApp::MODULE",
+    "properties": {
+        "Parameters": {
+            "type": "object",
+            "properties": {
+                "ApplicationName": {
+                    "type": "object",
+                    "properties": {
+                        "Type": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "Type"
+                    ]
+                },
+                "ApplicationImage": {
+                    "type": "object",
+                    "properties": {
+                        "Type": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "Type"
+                    ]
+                },
+                "TaskCount": {
+                    "type": "object",
+                    "properties": {
+                        "Type": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "Type"
+                    ]
+                },
+                "Memory": {
+                    "type": "object",
+                    "properties": {
+                        "Type": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "Type"
+                    ]
+                },
+                "CPU": {
+                    "type": "object",
+                    "properties": {
+                        "Type": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "Type"
+                    ]
+                },
+                "ApplicationPort": {
+                    "type": "object",
+                    "properties": {
+                        "Type": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "Type"
+                    ]
+                },
+                "NeedsDatabase": {
+                    "type": "object",
+                    "properties": {
+                        "Type": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "Type"
+                    ]
+                },
+                "RDSEngine": {
+                    "type": "object",
+                    "properties": {
+                        "Type": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "Type"
+                    ]
+                },
+                "RDSSize": {
+                    "type": "object",
+                    "properties": {
+                        "Type": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "Type"
+                    ]
+                },
+                "RDSMultiAz": {
+                    "type": "object",
+                    "properties": {
+                        "Type": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "Type"
+                    ]
+                },
+                "RDSStorage": {
+                    "type": "object",
+                    "properties": {
+                        "Type": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "Type"
+                    ]
+                },
+                "NeedsBalancer": {
+                    "type": "object",
+                    "properties": {
+                        "Type": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "Type"
+                    ]
+                },
+                "PubliclyAvailable": {
+                    "type": "object",
+                    "properties": {
+                        "Type": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "Type"
+                    ]
+                },
+                "VpcId": {
+                    "type": "object",
+                    "properties": {
+                        "Type": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "Type"
+                    ]
+                },
+                "PublicSubnets": {
+                    "type": "object",
+                    "properties": {
+                        "Type": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "Type"
+                    ]
+                },
+                "AppSubnets": {
+                    "type": "object",
+                    "properties": {
+                        "Type": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "Type"
+                    ]
+                },
+                "ExecRoleArn": {
+                    "type": "object",
+                    "properties": {
+                        "Type": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "Type"
+                    ]
+                },
+                "EcsCluster": {
+                    "type": "object",
+                    "properties": {
+                        "Type": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "Type"
+                    ]
+                },
+                "DbSubnetGroup": {
+                    "type": "object",
+                    "properties": {
+                        "Type": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "Type"
+                    ]
+                }
+            }
+        },
+        "Resources": {
+            "properties": {
+                "Logs": {
+                    "type": "object",
+                    "properties": {
+                        "Type": {
+                            "type": "string",
+                            "const": "AWS::Logs::LogGroup"
+                        },
+                        "Properties": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "LbSg": {
+                    "type": "object",
+                    "properties": {
+                        "Type": {
+                            "type": "string",
+                            "const": "AWS::EC2::SecurityGroup"
+                        },
+                        "Properties": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "Lb": {
+                    "type": "object",
+                    "properties": {
+                        "Type": {
+                            "type": "string",
+                            "const": "AWS::ElasticLoadBalancingV2::LoadBalancer"
+                        },
+                        "Properties": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "Listener": {
+                    "type": "object",
+                    "properties": {
+                        "Type": {
+                            "type": "string",
+                            "const": "AWS::ElasticLoadBalancingV2::Listener"
+                        },
+                        "Properties": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "LbReady": {
+                    "type": "object",
+                    "properties": {
+                        "Type": {
+                            "type": "string",
+                            "const": "AWS::CloudFormation::WaitConditionHandle"
+                        },
+                        "Properties": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "AppSg": {
+                    "type": "object",
+                    "properties": {
+                        "Type": {
+                            "type": "string",
+                            "const": "AWS::EC2::SecurityGroup"
+                        },
+                        "Properties": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "AppSgRule": {
+                    "type": "object",
+                    "properties": {
+                        "Type": {
+                            "type": "string",
+                            "const": "AWS::EC2::SecurityGroupIngress"
+                        },
+                        "Properties": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "AppTg": {
+                    "type": "object",
+                    "properties": {
+                        "Type": {
+                            "type": "string",
+                            "const": "AWS::ElasticLoadBalancingV2::TargetGroup"
+                        },
+                        "Properties": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "EcsTask": {
+                    "type": "object",
+                    "properties": {
+                        "Type": {
+                            "type": "string",
+                            "const": "AWS::ECS::TaskDefinition"
+                        },
+                        "Properties": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "EcsService": {
+                    "type": "object",
+                    "properties": {
+                        "Type": {
+                            "type": "string",
+                            "const": "AWS::ECS::Service"
+                        },
+                        "Properties": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "DatabaseSecret": {
+                    "type": "object",
+                    "properties": {
+                        "Type": {
+                            "type": "string",
+                            "const": "AWS::SecretsManager::Secret"
+                        },
+                        "Properties": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "DatabaseSg": {
+                    "type": "object",
+                    "properties": {
+                        "Type": {
+                            "type": "string",
+                            "const": "AWS::EC2::SecurityGroup"
+                        },
+                        "Properties": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "Database": {
+                    "type": "object",
+                    "properties": {
+                        "Type": {
+                            "type": "string",
+                            "const": "AWS::RDS::DBInstance"
+                        },
+                        "Properties": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "DatabaseSgIngressRule": {
+                    "type": "object",
+                    "properties": {
+                        "Type": {
+                            "type": "string",
+                            "const": "AWS::EC2::SecurityGroupIngress"
+                        },
+                        "Properties": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "type": "object",
+            "additionalProperties": false
+        }
+    },
+    "additionalProperties": true
+}

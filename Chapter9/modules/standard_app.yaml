@@ -1,0 +1,19 @@
+Resources:
+  StandardApp:
+    Type: "Org::Apps::StandardApp::MODULE"
+    Properties: 
+      ApplicationName: nginx
+      ApplicationImage: nginx:latest
+      TaskCount: 1
+      Memory: 512
+      CPU: 256
+      ApplicationPort: 80
+      NeedsDatabase: False
+      NeedsBalancer: False
+      PubliclyAvailable: False
+      VpcId: !ImportValue VpcId
+      DbSubnetGroup: !ImportValue DbSubnetGroup
+      ExecRoleArn: !ImportValue ExecRole
+      EcsCluster: !ImportValue EcsCluster
+      PublicSubnets: !Split [",", !ImportValue PublicSubnets]
+      AppSubnets: !Split [",", !ImportValue AppSubnets]

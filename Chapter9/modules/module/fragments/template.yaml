@@ -1,0 +1,217 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Parameters:
+    # You might notices that some parameters have default values and some are not
+    # If the resource has a creation condition, but refers to a parameter
+    # The parameter must be set despite if the resource will or will not be create
+    # Default values here are protecting the module user from such errors when they
+    # Don't need a database but must define its type and storage size anyway.
+    ApplicationName:
+      Type: String
+    ApplicationImage:
+      Type: String
+    TaskCount:
+      Type: Number
+    Memory:
+      Type: Number
+    CPU:
+      Type: Number
+    ApplicationPort:
+      Type: Number
+    NeedsDatabase:
+      Type: String
+      AllowedValues: [True, False]
+    RDSEngine:
+      Type: String
+      Default: MySQL
+    RDSSize:
+      Type: String
+      Default: db.t3.small
+    RDSMultiAz:
+      Type: String
+      AllowedValues: [True, False]
+      Default: False
+    RDSStorage:
+      Type: Number
+      Default: 10
+    NeedsBalancer:
+      Type: String
+      AllowedValues: [True, False]
+    PubliclyAvailable: 
+      Type: String 
+      AllowedValues: [True, False]
+    VpcId:
+      Type: AWS::EC2::VPC::Id
+    PublicSubnets:
+      Type: List<AWS::EC2::Subnet::Id>
+    AppSubnets:
+      Type: List<AWS::EC2::Subnet::Id>
+    ExecRoleArn:
+      Type: String
+    EcsCluster:
+      Type: String
+    DbSubnetGroup:
+      Type: String
+    
+
+Conditions:
+  NeedsBalancer: !Equals [!Ref NeedsBalancer, True]
+  NeedsDatabase: !Equals [!Ref NeedsDatabase, True]
+  PubliclyAvailable: !Equals [!Ref PubliclyAvailable, True]
+
+Resources:
+  Logs:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: !Ref ApplicationName
+      RetentionInDays: 1
+  
+  LbSg:
+    Condition: NeedsBalancer
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: "LB Security Group"
+      VpcId: !Ref VpcId
+  
+  Lb:
+    Condition: NeedsBalancer
+    Type: "AWS::ElasticLoadBalancingV2::LoadBalancer"
+    Properties:
+      Scheme: !If [PubliclyAvailable, "internet-facing", "internal"]
+      SecurityGroups:
+        - !Ref LbSg
+      Subnets: !Ref PublicSubnets
+
+  Listener:
+    Condition: NeedsBalancer
+    Type: "AWS::ElasticLoadBalancingV2::Listener"
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref AppTg
+      LoadBalancerArn: !Ref Lb
+      Port: !Ref ApplicationPort
+      Protocol: HTTP
+  
+  # This wait condition handle is needed to provide a conditional DependsOn for ECS Service
+  # Otherwise the ECS service will error out because the TG and not yet associated with ELB
+  LbReady:
+    Type: "AWS::CloudFormation::WaitConditionHandle"
+    Metadata:
+      LbPresent: !If [NeedsBalancer, !Ref Lb, !Ref AWS::NoValue]
+
+
+  AppSg:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: !Sub "${ApplicationName} Security Group"
+      VpcId: !Ref VpcId
+  
+  AppSgRule:
+    Condition: NeedsBalancer
+    Type: "AWS::EC2::SecurityGroupIngress"
+    Properties:
+      IpProtocol: "tcp"
+      FromPort: !Ref ApplicationPort
+      ToPort: !Ref ApplicationPort
+      SourceSecurityGroupId: !Ref LbSg
+      GroupId: !Ref AppSg
+      
+  AppTg:
+    Condition: NeedsBalancer
+    Type: "AWS::ElasticLoadBalancingV2::TargetGroup"
+    Properties:
+      TargetType: "ip"
+      HealthCheckIntervalSeconds: 6
+      HealthCheckPath: "/"
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 2
+      Name: !Ref ApplicationName
+      Port: !Ref ApplicationPort
+      Protocol: "HTTP"
+      UnhealthyThresholdCount: 2
+      VpcId: !Ref VpcId
+  EcsTask:
+    Type: "AWS::ECS::TaskDefinition"
+    Properties:
+      Family: !Ref ApplicationName
+      RequiresCompatibilities: ["FARGATE"]
+      ContainerDefinitions:
+        - Image: !Ref ApplicationImage
+          Name: !Ref ApplicationName
+          PortMappings:
+            - ContainerPort: !Ref ApplicationPort
+              Protocol: "tcp"
+          LogConfiguration:
+            LogDriver: "awslogs"
+            Options:
+              awslogs-group: !Ref Logs
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: !Sub "${ApplicationName}-"
+      Cpu: !Ref CPU
+      ExecutionRoleArn: !Ref ExecRoleArn
+      Memory: !Ref Memory
+      NetworkMode: "awsvpc"
+  
+  EcsService:
+    Type: "AWS::ECS::Service"
+    DependsOn: LbReady
+    Properties:
+      Cluster: !Ref EcsCluster
+      DesiredCount: !Ref TaskCount
+      TaskDefinition: !Ref EcsTask
+      LaunchType: "FARGATE"
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: "ENABLED"
+          SecurityGroups:
+            - !Ref AppSg
+          Subnets: !Ref AppSubnets
+      LoadBalancers:
+        Fn::If:
+          - NeedsBalancer
+          - - TargetGroupArn: !Ref AppTg
+              ContainerPort: !Ref ApplicationPort
+              ContainerName: !Ref ApplicationName
+          - !Ref AWS::NoValue
+
+  DatabaseSecret:
+    Condition: NeedsDatabase
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Description: !Sub "${ApplicationName} Database credentials"
+      GenerateSecretString:
+        SecretStringTemplate: !Sub '{"username": "${ApplicationName}"}'
+        GenerateStringKey: "password"
+        PasswordLength: 16
+        ExcludeCharacters: '"@/\'
+
+  DatabaseSg:
+    Condition: NeedsDatabase
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: "Database security group"
+      VpcId: !Ref VpcId
+
+  Database:
+    Condition: NeedsDatabase
+    Type: "AWS::RDS::DBInstance"
+    Properties:
+      Engine: !Ref RDSEngine
+      DBSubnetGroupName: !Ref DbSubnetGroup
+      MasterUsername: !Sub "{{resolve:secretsmanager:${DatabaseSecret}:SecretString:username}}"  
+      MasterUserPassword: !Sub "{{resolve:secretsmanager:${DatabaseSecret}:SecretString:password}}"  
+      VPCSecurityGroups:
+        - !Ref DatabaseSg
+      MultiAZ: !Ref RDSMultiAz
+      AllocatedStorage: !Ref RDSStorage
+      DBInstanceClass: !Ref RDSSize
+
+  DatabaseSgIngressRule:
+    Condition: NeedsDatabase
+    Type: "AWS::EC2::SecurityGroupIngress"
+    Properties:
+      IpProtocol: tcp
+      FromPort: !GetAtt Database.Endpoint.Port
+      ToPort:  !GetAtt Database.Endpoint.Port
+      SourceSecurityGroupId: !Ref AppSg
+      GroupId: !Ref DatabaseSg
